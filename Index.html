@@ -1,0 +1,865 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Back To You - Global Lost & Found</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* Navigation */
+        nav {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 1rem 2rem;
+            box-shadow: 0 2px 20px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+        }
+
+        .nav-links a, .nav-links button {
+            text-decoration: none;
+            color: #333;
+            font-weight: 500;
+            cursor: pointer;
+            background: none;
+            border: none;
+            transition: color 0.3s;
+        }
+
+        .nav-links a:hover, .nav-links button:hover {
+            color: #667eea;
+        }
+
+        .btn {
+            padding: 0.7rem 1.5rem;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+            font-size: 0.95rem;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: white;
+            color: #667eea;
+            border: 2px solid #667eea;
+        }
+
+        .btn-secondary:hover {
+            background: #667eea;
+            color: white;
+        }
+
+        /* Views */
+        .view {
+            display: none;
+            animation: fadeIn 0.5s;
+        }
+
+        .view.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Home View */
+        .hero {
+            text-align: center;
+            padding: 4rem 2rem;
+            color: white;
+        }
+
+        .hero h1 {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .hero p {
+            font-size: 1.3rem;
+            margin-bottom: 2rem;
+            opacity: 0.95;
+        }
+
+        .search-box {
+            background: white;
+            padding: 2rem;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            margin: 2rem auto;
+            max-width: 600px;
+        }
+
+        .search-box input, .search-box select {
+            width: 100%;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: border 0.3s;
+        }
+
+        .search-box input:focus, .search-box select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+
+        .feature-card {
+            background: white;
+            padding: 2rem;
+            border-radius: 15px;
+            text-align: center;
+            transition: transform 0.3s;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        }
+
+        .feature-card:hover {
+            transform: translateY(-10px);
+        }
+
+        .feature-card .icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        /* Auth Forms */
+        .auth-container {
+            max-width: 450px;
+            margin: 3rem auto;
+            background: white;
+            padding: 3rem;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+        }
+
+        .auth-container h2 {
+            text-align: center;
+            margin-bottom: 2rem;
+            color: #667eea;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: #555;
+        }
+
+        .form-group input, .form-group textarea, .form-group select {
+            width: 100%;
+            padding: 0.9rem;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: border 0.3s;
+        }
+
+        .form-group input:focus, .form-group textarea:focus, .form-group select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        /* Search Results */
+        .results-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .item-card {
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            transition: transform 0.3s;
+            cursor: pointer;
+        }
+
+        .item-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+        }
+
+        .item-card img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+        }
+
+        .item-card-content {
+            padding: 1.5rem;
+        }
+
+        .item-card h3 {
+            color: #667eea;
+            margin-bottom: 0.5rem;
+        }
+
+        .item-card p {
+            color: #666;
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 0.3rem 0.8rem;
+            background: #e0e7ff;
+            color: #667eea;
+            border-radius: 15px;
+            font-size: 0.85rem;
+            margin-right: 0.5rem;
+            margin-top: 0.5rem;
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.7);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 20px;
+            max-width: 600px;
+            max-height: 90vh;
+            overflow-y: auto;
+            padding: 2rem;
+            position: relative;
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: none;
+            border: none;
+            font-size: 2rem;
+            cursor: pointer;
+            color: #999;
+        }
+
+        .file-upload {
+            border: 2px dashed #667eea;
+            padding: 2rem;
+            text-align: center;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .file-upload:hover {
+            background: #f5f7ff;
+        }
+
+        .alert {
+            padding: 1rem;
+            border-radius: 10px;
+            margin-bottom: 1rem;
+            animation: slideDown 0.3s;
+        }
+
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .alert-error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        @keyframes slideDown {
+            from { transform: translateY(-20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        @media (max-width: 768px) {
+            .hero h1 { font-size: 2rem; }
+            .nav-links { gap: 1rem; }
+            .features { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav>
+        <div class="logo">🔄 Back To You</div>
+        <div class="nav-links" id="navLinks">
+            <a href="#" onclick="showView('home')">Home</a>
+            <a href="#" onclick="showView('search')">Search Items</a>
+            <button onclick="showView('login')" class="btn btn-secondary">Login</button>
+            <button onclick="showView('register')" class="btn btn-primary">Sign Up</button>
+        </div>
+    </nav>
+
+    <div class="container">
+        <!-- Home View -->
+        <div id="homeView" class="view active">
+            <div class="hero">
+                <h1>Lost Something? Found Something?</h1>
+                <p>Connect with people worldwide to reunite lost items with their owners</p>
+                <div style="display: flex; gap: 1rem; justify-content: center; margin-top: 2rem;">
+                    <button onclick="showView('uploadItem')" class="btn btn-primary">Report Found Item</button>
+                    <button onclick="showView('search')" class="btn btn-secondary">Search Lost Items</button>
+                </div>
+            </div>
+
+            <div class="features">
+                <div class="feature-card">
+                    <div class="icon">🔍</div>
+                    <h3>Smart Search</h3>
+                    <p>Find your lost items quickly with our intelligent search filters</p>
+                </div>
+                <div class="feature-card">
+                    <div class="icon">🔒</div>
+                    <h3>Secure Verification</h3>
+                    <p>Protected ownership verification to prevent fraud</p>
+                </div>
+                <div class="feature-card">
+                    <div class="icon">💬</div>
+                    <h3>Safe Communication</h3>
+                    <p>In-app messaging keeps your personal info private</p>
+                </div>
+                <div class="feature-card">
+                    <div class="icon">🌍</div>
+                    <h3>Global Platform</h3>
+                    <p>Connect with finders and owners worldwide</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Login View -->
+        <div id="loginView" class="view">
+            <div class="auth-container">
+                <h2>Welcome Back</h2>
+                <div id="loginAlert"></div>
+                <form onsubmit="handleLogin(event)">
+                    <div class="form-group">
+                        <label>Email</label>
+                        <input type="email" id="loginEmail" required placeholder="Enter your email">
+                    </div>
+                    <div class="form-group">
+                        <label>Password</label>
+                        <input type="password" id="loginPassword" required placeholder="Enter your password">
+                    </div>
+                    <button type="submit" class="btn btn-primary" style="width: 100%;">Login</button>
+                    <p style="text-align: center; margin-top: 1rem;">
+                        Don't have an account? <a href="#" onclick="showView('register')" style="color: #667eea;">Sign up</a>
+                    </p>
+                </form>
+            </div>
+        </div>
+
+        <!-- Register View -->
+        <div id="registerView" class="view">
+            <div class="auth-container">
+                <h2>Create Account</h2>
+                <div id="registerAlert"></div>
+                <form onsubmit="handleRegister(event)">
+                    <div class="form-group">
+                        <label>Full Name</label>
+                        <input type="text" id="regName" required placeholder="Enter your name">
+                    </div>
+                    <div class="form-group">
+                        <label>Email</label>
+                        <input type="email" id="regEmail" required placeholder="Enter your email">
+                    </div>
+                    <div class="form-group">
+                        <label>Phone</label>
+                        <input type="tel" id="regPhone" placeholder="Enter your phone number">
+                    </div>
+                    <div class="form-group">
+                        <label>Password</label>
+                        <input type="password" id="regPassword" required placeholder="Create a password">
+                    </div>
+                    <button type="submit" class="btn btn-primary" style="width: 100%;">Sign Up</button>
+                    <p style="text-align: center; margin-top: 1rem;">
+                        Already have an account? <a href="#" onclick="showView('login')" style="color: #667eea;">Login</a>
+                    </p>
+                </form>
+            </div>
+        </div>
+<div style="
+    background: white;
+    border-radius: 20px;
+    padding: 2rem;
+    margin: 4rem auto 2rem;
+    max-width: 500px;
+    text-align: center;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+">
+    <img src="abdul.jpg" alt="Abdul Gafur"
+         style="
+            width: 140px;
+            height: 140px;
+            object-fit: cover;
+            border-radius: 50%;
+            border: 4px solid #667eea;
+            margin-bottom: 1rem;
+         ">
+
+    <h3 style="
+        margin-bottom: 0.3rem;
+        color: #333;
+        font-size: 1.4rem;
+    ">
+        Abdul Gafur
+    </h3>
+
+    <p style="
+        color: #666;
+        font-size: 0.95rem;
+        margin-bottom: 0.3rem;
+    ">
+        Founder & Developer
+    </p>
+
+    <p style="
+        color: #666;
+        font-size: 0.95rem;
+    ">
+        Back To You – Global Lost & Found Platform
+    </p>
+</div>
+        <!-- Search View -->
+        <div id="searchView" class="view">
+            <div class="search-box">
+                <h2 style="text-align: center; margin-bottom: 1.5rem; color: #667eea;">Search Lost Items</h2>
+                <input type="text" id="searchQuery" placeholder="What did you lose? (e.g., wallet, phone)" required>
+                <input type="text" id="searchLocation" placeholder="Location (city, area)">
+                <select id="searchCategory">
+                    <option value="">All Categories</option>
+                    <option value="electronics">Electronics</option>
+                    <option value="documents">Documents</option>
+                    <option value="accessories">Accessories</option>
+                    <option value="bags">Bags</option>
+                    <option value="jewelry">Jewelry</option>
+                    <option value="other">Other</option>
+                </select>
+                <button onclick="searchItems()" class="btn btn-primary" style="width: 100%;">Search</button>
+            </div>
+
+            <div id="searchResults" class="results-grid"></div>
+        </div>
+
+        <!-- Upload Item View -->
+        <div id="uploadItemView" class="view">
+            <div class="auth-container" style="max-width: 600px;">
+                <h2>Report Found Item</h2>
+                <div id="uploadAlert"></div>
+                <form onsubmit="handleUploadItem(event)">
+                    <div class="form-group">
+                        <label>Item Name *</label>
+                        <input type="text" id="itemName" required placeholder="e.g., Black Leather Wallet">
+                    </div>
+                    <div class="form-group">
+                        <label>Category *</label>
+                        <select id="itemCategory" required>
+                            <option value="">Select Category</option>
+                            <option value="electronics">Electronics</option>
+                            <option value="documents">Documents</option>
+                            <option value="accessories">Accessories</option>
+                            <option value="bags">Bags</option>
+                            <option value="jewelry">Jewelry</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Public Description *</label>
+                        <textarea id="itemDescription" rows="3" required placeholder="Brief description visible to everyone"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>Private Verification Details *</label>
+                        <textarea id="itemVerification" rows="3" required placeholder="Hidden details to verify ownership (e.g., contents, unique marks)"></textarea>
+                        <small style="color: #999;">This will only be shown to claimants</small>
+                    </div>
+                    <div class="form-group">
+                        <label>Location Found *</label>
+                        <input type="text" id="itemLocation" required placeholder="Where did you find it?">
+                    </div>
+                    <div class="form-group">
+                        <label>Date Found *</label>
+                        <input type="date" id="itemDate" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Upload Photos</label>
+                        <div class="file-upload" onclick="document.getElementById('itemImage').click()">
+                            <p>📷 Click to upload images</p>
+                            <input type="file" id="itemImage" accept="image/*" multiple style="display: none;" onchange="previewImages(this)">
+                        </div>
+                        <div id="imagePreview" style="margin-top: 1rem;"></div>
+                    </div>
+                    <button type="submit" class="btn btn-primary" style="width: 100%;">Submit Found Item</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Dashboard View (After Login) -->
+        <div id="dashboardView" class="view">
+            <h2 style="color: white; margin-bottom: 2rem;">My Dashboard</h2>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem;">
+                <div class="feature-card">
+                    <h3>My Found Items</h3>
+                    <p style="font-size: 2rem; color: #667eea; margin: 1rem 0;">3</p>
+                    <button class="btn btn-primary">View Items</button>
+                </div>
+                <div class="feature-card">
+                    <h3>My Claims</h3>
+                    <p style="font-size: 2rem; color: #667eea; margin: 1rem 0;">1</p>
+                    <button class="btn btn-primary">View Claims</button>
+                </div>
+                <div class="feature-card">
+                    <h3>Trust Score</h3>
+                    <p style="font-size: 2rem; color: #667eea; margin: 1rem 0;">4.8/5.0</p>
+                    <button class="btn btn-secondary">View Profile</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Item Detail Modal -->
+    <div id="itemModal" class="modal">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeModal()">&times;</button>
+            <div id="modalContent"></div>
+        </div>
+    </div>
+
+    <script>
+        // Mock database
+        let users = [];
+        let items = [];
+        let currentUser = null;
+
+        // Sample items for demonstration
+        items = [
+            {
+                id: 1,
+                name: "Black Leather Wallet",
+                category: "accessories",
+                description: "Found near Central Park, contains cards",
+                location: "New York, NY",
+                date: "2024-12-20",
+                image: "https://images.unsplash.com/photo-1627123424574-724758594e93?w=400",
+                finder: "John Doe",
+                status: "active"
+            },
+            {
+                id: 2,
+                name: "iPhone 13 Pro",
+                category: "electronics",
+                description: "Blue color, cracked screen protector",
+                location: "Los Angeles, CA",
+                date: "2024-12-19",
+                image: "https://images.unsplash.com/photo-1632661674596-df8be070a5c5?w=400",
+                finder: "Jane Smith",
+                status: "active"
+            },
+            {
+                id: 3,
+                name: "House Keys with Keychain",
+                category: "accessories",
+                description: "Silver keys with red keychain",
+                location: "Chicago, IL",
+                date: "2024-12-18",
+                image: "https://images.unsplash.com/photo-1582139329536-e7284fece509?w=400",
+                finder: "Mike Johnson",
+                status: "active"
+            }
+        ];
+
+        function showView(viewName) {
+            document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+            document.getElementById(viewName + 'View').classList.add('active');
+            
+            if (viewName === 'search') {
+                displayAllItems();
+            }
+        }
+
+        function handleLogin(e) {
+            e.preventDefault();
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+            
+            const user = users.find(u => u.email === email && u.password === password);
+            
+            if (user) {
+                currentUser = user;
+                showAlert('loginAlert', 'Login successful!', 'success');
+                setTimeout(() => {
+                    updateNavForLoggedIn();
+                    showView('dashboard');
+                }, 1000);
+            } else {
+                showAlert('loginAlert', 'Invalid credentials. Try demo@example.com / demo123', 'error');
+            }
+        }
+
+        function handleRegister(e) {
+            e.preventDefault();
+            const newUser = {
+                id: users.length + 1,
+                name: document.getElementById('regName').value,
+                email: document.getElementById('regEmail').value,
+                phone: document.getElementById('regPhone').value,
+                password: document.getElementById('regPassword').value,
+                trustScore: 5.0
+            };
+            
+            users.push(newUser);
+            currentUser = newUser;
+            showAlert('registerAlert', 'Account created successfully!', 'success');
+            setTimeout(() => {
+                updateNavForLoggedIn();
+                showView('dashboard');
+            }, 1000);
+        }
+
+        function handleUploadItem(e) {
+            e.preventDefault();
+            const newItem = {
+                id: items.length + 1,
+                name: document.getElementById('itemName').value,
+                category: document.getElementById('itemCategory').value,
+                description: document.getElementById('itemDescription').value,
+                verification: document.getElementById('itemVerification').value,
+                location: document.getElementById('itemLocation').value,
+                date: document.getElementById('itemDate').value,
+                image: "https://images.unsplash.com/photo-1581235720704-06d3acfcb36f?w=400",
+                finder: currentUser ? currentUser.name : "Anonymous",
+                status: "active"
+            };
+            
+            items.push(newItem);
+            showAlert('uploadAlert', 'Item submitted successfully!', 'success');
+            e.target.reset();
+            document.getElementById('imagePreview').innerHTML = '';
+        }
+
+        function searchItems() {
+            const query = document.getElementById('searchQuery').value.toLowerCase();
+            const location = document.getElementById('searchLocation').value.toLowerCase();
+            const category = document.getElementById('searchCategory').value;
+            
+            const filtered = items.filter(item => {
+                const matchesQuery = !query || item.name.toLowerCase().includes(query) || 
+                                   item.description.toLowerCase().includes(query);
+                const matchesLocation = !location || item.location.toLowerCase().includes(location);
+                const matchesCategory = !category || item.category === category;
+                
+                return matchesQuery && matchesLocation && matchesCategory;
+            });
+            
+            displaySearchResults(filtered);
+        }
+
+        function displayAllItems() {
+            displaySearchResults(items);
+        }
+
+        function displaySearchResults(results) {
+            const container = document.getElementById('searchResults');
+            
+            if (results.length === 0) {
+                container.innerHTML = '<div style="text-align: center; color: white; padding: 3rem;"><h3>No items found</h3><p>Try adjusting your search criteria</p></div>';
+                return;
+            }
+            
+            container.innerHTML = results.map(item => `
+                <div class="item-card" onclick="showItemDetail(${item.id})">
+                    <img src="${item.image}" alt="${item.name}">
+                    <div class="item-card-content">
+                        <h3>${item.name}</h3>
+                        <p><strong>📍</strong> ${item.location}</p>
+                        <p><strong>📅</strong> Found on ${item.date}</p>
+                        <p>${item.description}</p>
+                        <span class="badge">${item.category}</span>
+                        <span class="badge">Found by ${item.finder}</span>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function showItemDetail(itemId) {
+            const item = items.find(i => i.id === itemId);
+            const modal = document.getElementById('itemModal');
+            const content = document.getElementById('modalContent');
+            
+            content.innerHTML = `
+                <img src="${item.image}" style="width: 100%; border-radius: 10px; margin-bottom: 1rem;">
+                <h2>${item.name}</h2>
+                <p><strong>Category:</strong> ${item.category}</p>
+                <p><strong>Location:</strong> ${item.location}</p>
+                <p><strong>Date Found:</strong> ${item.date}</p>
+                <p><strong>Description:</strong> ${item.description}</p>
+                <p><strong>Found by:</strong> ${item.finder}</p>
+                <div style="margin-top: 2rem;">
+                    <button class="btn btn-primary" onclick="claimItem(${itemId})" style="width: 100%;">
+                        Claim This Item
+                    </button>
+                </div>
+            `;
+            
+            modal.classList.add('active');
+        }
+
+        function closeModal() {
+            document.getElementById('itemModal').classList.remove('active');
+        }
+
+        function claimItem(itemId) {
+            if (!currentUser) {
+                closeModal();
+                showView('login');
+                showAlert('loginAlert', 'Please login to claim items', 'error');
+                return;
+            }
+            alert('Claim submitted! The finder will review your ownership proof.');
+            closeModal();
+        }
+
+        function previewImages(input) {
+            const preview = document.getElementById('imagePreview');
+            preview.innerHTML = '';
+            
+            if (input.files) {
+                Array.from(input.files).forEach(file => {
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        const img = document.createElement('img');
+                        img.src = e.target.result;
+                        img.style.width = '100px';
+                        img.style.height = '100px';
+                        img.style.objectFit = 'cover';
+                        img.style.borderRadius = '10px';
+                        img.style.marginRight = '10px';
+                        preview.appendChild(img);
+                    };
+                    reader.readAsDataURL(file);
+                });
+            }
+        }
+
+        function showAlert(containerId, message, type) {
+            const container = document.getElementById(containerId);
+            container.innerHTML = `<div class="alert alert-${type}">${message}</div>`;
+            setTimeout(() => container.innerHTML = '', 3000);
+        }
+
+        function updateNavForLoggedIn() {
+            document.getElementById('navLinks').innerHTML = `
+                <a href="#" onclick="showView('home')">Home</a>
+                <a href="#" onclick="showView('search')">Search Items</a>
+                <a href="#" onclick="showView('uploadItem')">Report Found</a>
+                <a href="#" onclick="showView('dashboard')">Dashboard</a>
+                <button onclick="logout()" class="btn btn-secondary">Logout</button>
+            `;
+        }
+
+        function logout() {
+            currentUser = null;
+            document.getElementById('navLinks').innerHTML = `
+                <a href="#" onclick="showView('home')">Home</a>
+                <a href="#" onclick="showView('search')">Search Items</a>
+                <button onclick="showView('login')" class="btn btn-secondary">Login</button>
+                <button onclick="showView('register')" class="btn btn-primary">Sign Up</button>
+            `;
+            showView('home');
+        }
+
+        // Close modal on outside click
+        window.onclick = (e) => {
+            const modal = document.getElementById('itemModal');
+            if (e.target === modal) closeModal();
+        };
+    </script>
+  <footer style="
+    text-align:center;
+    padding:1.5rem;
+    color:white;
+    opacity:0.8;
+">
+    © 2025 Back To You | Built & Deployed by Abdul Gafur
+</footer>
+</body>
+</html>

@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+
+{% block title %}Report Found Item — Group No1{% endblock %}
+
+{% block content %}
+<div class="auth-container" style="max-width: 650px;">
+    <h2>Report Found Item</h2>
+    <p class="subtitle">Provide accurate details to help the rightful owner identify their item while keeping sensitive markers secure.</p>
+
+    <form method="POST" action="{{ url_for('items.report') }}" enctype="multipart/form-data">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+        <div class="form-group">
+            {{ form.name.label }}
+            {{ form.name(class="form-control", placeholder="e.g. Black Leather Wallet, Silver Keyring, iPhone 13") }}
+            {% for error in form.name.errors %}
+                <span class="field-error">{{ error }}</span>
+            {% endfor %}
+        </div>
+
+        <div class="form-group">
+            {{ form.category.label }}
+            {{ form.category(class="form-control") }}
+            {% for error in form.category.errors %}
+                <span class="field-error">{{ error }}</span>
+            {% endfor %}
+        </div>
+
+        <div class="form-group">
+            {{ form.public_description.label }}
+            {{ form.public_description(class="form-control", rows="3", placeholder="Brief description visible to everyone (color, general location, external appearance)") }}
+            <small>Visible in public searches. Do not include secret marks or contents.</small>
+            {% for error in form.public_description.errors %}
+                <span class="field-error">{{ error }}</span>
+            {% endfor %}
+        </div>
+
+        <div class="form-group">
+            {{ form.private_verification_details.label }}
+            {{ form.private_verification_details(class="form-control", rows="3", placeholder="Hidden details to verify ownership (e.g. inner initials, specific cards, lock-screen text, scratches)") }}
+            <small style="color: #667eea; font-weight: 500;">🔒 Strictly confidential: this is NEVER shown publicly. Only you and authorized claim reviewers can see it.</small>
+            {% for error in form.private_verification_details.errors %}
+                <span class="field-error">{{ error }}</span>
+            {% endfor %}
+        </div>
+
+        <div class="form-group">
+            {{ form.location_found.label }}
+            {{ form.location_found(class="form-control", placeholder="e.g. Central Library 2nd floor, Metro Line 3, City Park Bench") }}
+            {% for error in form.location_found.errors %}
+                <span class="field-error">{{ error }}</span>
+            {% endfor %}
+        </div>
+
+        <div class="form-group">
+            {{ form.date_found.label }}
+            {{ form.date_found(class="form-control", type="date") }}
+            {% for error in form.date_found.errors %}
+                <span class="field-error">{{ error }}</span>
+            {% endfor %}
+        </div>
+
+        <!-- Preserved & Enhanced File Upload Area with Real-time Thumbnail Previews -->
+        <div class="form-group">
+            <label>Upload Photos (Optional)</label>
+            <div class="file-upload" onclick="document.getElementById('itemImagesInput').click()" role="button" tabindex="0">
+                <span class="file-upload-icon">📷</span>
+                <p style="font-weight: 600; color: #667eea; margin-bottom: 0.2rem;">Click to upload photos</p>
+                <small style="color: #64748b;">Supports PNG, JPG, JPEG, GIF, WEBP (Max 5MB each)</small>
+                <input type="file" id="itemImagesInput" name="images" accept="image/*" multiple style="display: none;" onchange="previewImages(this)">
+            </div>
+            <div id="imagePreview" class="image-preview-container"></div>
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-block" style="padding: 0.9rem; font-size: 1.05rem;">
+            Submit Found Item Report
+        </button>
+    </form>
+</div>
+{% endblock %}

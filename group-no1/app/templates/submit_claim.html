@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+
+{% block title %}Claim Ownership: {{ item.name }} — Group No1{% endblock %}
+
+{% block content %}
+<div class="auth-container" style="max-width: 650px;">
+    <h2>Submit Ownership Claim</h2>
+    <p class="subtitle">You are claiming: <strong>{{ item.name }}</strong> (Found at {{ item.location_found }})</p>
+
+    <div style="background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 10px; padding: 1.2rem; margin-bottom: 1.8rem; font-size: 0.92rem; color: #1e3a8a;">
+        <strong>Verification Policy:</strong> To protect property from fraud, please provide specific proof of ownership such as serial numbers, purchase invoices, distinctive marks, wallpapers, or exact internal contents.
+    </div>
+
+    <form method="POST" action="{{ url_for('claims.submit_claim', item_id=item.id) }}">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+        <div class="form-group">
+            {{ form.claim_message.label }}
+            {{ form.claim_message(class="form-control", rows="4", placeholder="Explain when and where you lost this item, along with any relevant context...") }}
+            {% for error in form.claim_message.errors %}
+                <span class="field-error">{{ error }}</span>
+            {% endfor %}
+        </div>
+
+        <div class="form-group">
+            {{ form.evidence_details.label }}
+            {{ form.evidence_details(class="form-control", rows="4", placeholder="Confidential proof: What is inside? What unique scratches, stickers, serial codes, passwords, or receipts prove it is yours?") }}
+            <small style="color: #667eea; font-weight: 500;">🔒 This proof will only be disclosed to the finder and authorized moderators to verify your identity.</small>
+            {% for error in form.evidence_details.errors %}
+                <span class="field-error">{{ error }}</span>
+            {% endfor %}
+        </div>
+
+        <div style="display: flex; gap: 1rem; margin-top: 2rem;">
+            <a href="{{ url_for('items.detail', item_id=item.id) }}" class="btn btn-secondary" style="flex: 1;">Cancel</a>
+            <button type="submit" class="btn btn-primary" style="flex: 2;">Submit Claim</button>
+        </div>
+    </form>
+</div>
+{% endblock %}

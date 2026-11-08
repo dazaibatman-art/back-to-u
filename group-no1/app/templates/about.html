@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+
+{% block title %}About Us — Group No1{% endblock %}
+
+{% block content %}
+<div style="max-width: 900px; margin: 2rem auto;">
+    <div style="background: white; border-radius: 20px; padding: 3rem 2.5rem; box-shadow: var(--shadow-elevated); margin-bottom: 2rem;">
+        <h1 style="color: #667eea; font-size: 2.4rem; margin-bottom: 1rem; text-align: center;">About Group No1</h1>
+        <p style="font-size: 1.15rem; color: #4a5568; text-align: center; max-width: 700px; margin: 0 auto 2.5rem; line-height: 1.7;">
+            Group No1 — Global Lost &amp; Found Management System is an open community platform engineered to safely reunite lost belongings with their rightful owners across cities and borders.
+        </p>
+
+        <div style="margin: 2rem 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem;">
+            <div style="padding: 1.5rem; background: #f8fafc; border-radius: 12px; border-left: 4px solid #667eea;">
+                <h3 style="color: #1e293b; margin-bottom: 0.5rem; font-size: 1.15rem;">🎯 Our Mission</h3>
+                <p style="color: #64748b; font-size: 0.95rem; line-height: 1.6;">
+                    Eliminating the heartbreak of lost items through secure technology, intelligent indexing, and safe privacy-first verification.
+                </p>
+            </div>
+
+            <div style="padding: 1.5rem; background: #f8fafc; border-radius: 12px; border-left: 4px solid #764ba2;">
+                <h3 style="color: #1e293b; margin-bottom: 0.5rem; font-size: 1.15rem;">🛡️ Privacy &amp; Integrity</h3>
+                <p style="color: #64748b; font-size: 0.95rem; line-height: 1.6;">
+                    Private verification details and sensitive evidence are kept strictly confidential to prevent fraudulent ownership claims.
+                </p>
+            </div>
+        </div>
+
+        <h2 style="color: #1e293b; font-size: 1.7rem; margin: 2.5rem 0 1.2rem; text-align: center;">Our Organization &amp; Team</h2>
+        <p style="text-align: center; color: #64748b; font-size: 0.95rem; margin-bottom: 2rem;">
+            Group No1 is maintained by a collaborative engineering and safety team with clearly defined responsibilities.
+        </p>
+
+        <div class="team-grid">
+            <div class="team-card">
+                <div class="team-avatar">💻</div>
+                <h4>Engineering &amp; Architecture</h4>
+                <div class="role">Group No1 Core Tech</div>
+                <p class="desc">Builds reliable database models, secure session handlers, and resilient search infrastructure.</p>
+            </div>
+
+            <div class="team-card">
+                <div class="team-avatar">🔍</div>
+                <h4>Moderation &amp; Verification</h4>
+                <div class="role">Safety &amp; Compliance</div>
+                <p class="desc">Monitors listings, reviews suspicious reports, and ensures legitimate ownership verification.</p>
+            </div>
+
+            <div class="team-card">
+                <div class="team-avatar">🌐</div>
+                <h4>Global Community Support</h4>
+                <div class="role">User Experience</div>
+                <p class="desc">Guides members through safe handoffs, account management, and notification settings.</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

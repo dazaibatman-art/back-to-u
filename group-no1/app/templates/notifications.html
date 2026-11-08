@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+
+{% block title %}Notifications — Group No1{% endblock %}
+
+{% block content %}
+<div style="max-width: 850px; margin: 2rem auto;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; color: white; flex-wrap: wrap; gap: 1rem;">
+        <div>
+            <h1 style="font-size: 2.2rem; font-weight: 700; margin: 0;">Notifications</h1>
+            <p style="opacity: 0.9; margin: 0.3rem 0 0;">Stay informed about your items, claim decisions, and messages.</p>
+        </div>
+        {% if notifications %}
+            <form action="{{ url_for('notifications.mark_all_read') }}" method="POST">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <button type="submit" class="btn btn-secondary btn-sm" style="color: white; border-color: white;">
+                    ✓ Mark All as Read
+                </button>
+            </form>
+        {% endif %}
+    </div>
+
+    {% if notifications %}
+        <div style="background: white; border-radius: 20px; padding: 2rem; box-shadow: var(--shadow-elevated);">
+            <div style="display: flex; flex-direction: column; gap: 1rem;">
+                {% for notif in notifications %}
+                    <div style="padding: 1.2rem; border-radius: 12px; display: flex; justify-content: space-between; align-items: center; gap: 1rem; flex-wrap: wrap; {% if not notif.is_read %}background: #f0f7ff; border-left: 4px solid #667eea;{% else %}background: #f8fafc;{% endif %}">
+                        <div style="flex: 1; min-width: 250px;">
+                            <div style="display: flex; align-items: center; gap: 0.6rem; margin-bottom: 0.3rem;">
+                                <strong style="color: #1e293b; font-size: 1.05rem;">{{ notif.title }}</strong>
+                                {% if not notif.is_read %}
+                                    <span class="badge" style="background: #e0e7ff; color: #4338ca; font-size: 0.75rem;">NEW</span>
+                                {% endif %}
+                            </div>
+                            <p style="color: #475569; font-size: 0.95rem; margin-bottom: 0.4rem;">
+                                {{ notif.message }}
+                            </p>
+                            <span style="font-size: 0.8rem; color: #94a3b8;">
+                                {{ notif.created_at.strftime('%b %d, %Y at %H:%M') }}
+                            </span>
+                        </div>
+
+                        <div style="display: flex; gap: 0.6rem; align-items: center;">
+                            {% if notif.related_claim_id %}
+                                <a href="{{ url_for('claims.detail', claim_id=notif.related_claim_id) }}" class="btn btn-primary btn-sm">
+                                    View Claim
+                                </a>
+                            {% elif notif.related_item_id %}
+                                <a href="{{ url_for('items.detail', item_id=notif.related_item_id) }}" class="btn btn-secondary btn-sm">
+                                    View Item
+                                </a>
+                            {% endif %}
+
+                            {% if not notif.is_read %}
+                                <form action="{{ url_for('notifications.mark_read', notification_id=notif.id) }}" method="POST">
+                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                    <button type="submit" class="btn btn-secondary btn-sm" title="Mark Read">
+                                        ✓
+                                    </button>
+                                </form>
+                            {% endif %}
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    {% else %}
+        <div style="background: white; border-radius: 20px; padding: 4rem 2rem; text-align: center; box-shadow: var(--shadow-soft);">
+            <div style="font-size: 3rem; margin-bottom: 1rem;">🔔</div>
+            <h3 style="color: #667eea; font-size: 1.5rem; margin-bottom: 0.5rem;">All caught up!</h3>
+            <p style="color: #64748b; max-width: 450px; margin: 0 auto;">
+                You don't have any notifications right now. Activity on your reported items or claims will appear here.
+            </p>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

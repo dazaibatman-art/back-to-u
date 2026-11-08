@@ -1,0 +1,127 @@
+{% extends "base.html" %}
+
+{% block title %}Search Lost Items — Group No1{% endblock %}
+
+{% block content %}
+<div style="max-width: 1000px; margin: 1rem auto 2rem;">
+    <div style="text-align: center; color: white; margin-bottom: 2rem;">
+        <h1 style="font-size: 2.4rem; font-weight: 700; margin-bottom: 0.5rem;">Search Lost Belongings</h1>
+        <p style="font-size: 1.1rem; opacity: 0.9;">Filter by keyword, location, category, or status to locate reported belongings.</p>
+    </div>
+
+    <!-- Search Box with Comprehensive Real Database Filters -->
+    <div class="search-box">
+        <form action="{{ url_for('items.search') }}" method="GET" id="searchFilterForm">
+            <div class="search-grid">
+                <div class="form-group" style="margin-bottom: 0;">
+                    <label for="searchQuery">Keyword</label>
+                    <input type="text" id="searchQuery" name="q" value="{{ query }}" 
+                           placeholder="What did you lose? (e.g. wallet, phone)" class="form-control">
+                </div>
+
+                <div class="form-group" style="margin-bottom: 0;">
+                    <label for="searchLocation">Location</label>
+                    <input type="text" id="searchLocation" name="location" value="{{ location }}" 
+                           placeholder="City, area, or transit" class="form-control">
+                </div>
+
+                <div class="form-group" style="margin-bottom: 0;">
+                    <label for="searchCategory">Category</label>
+                    <select id="searchCategory" name="category" class="form-control">
+                        {% for val, label in categories %}
+                            <option value="{{ val }}" {% if selected_category == val %}selected{% endif %}>
+                                {{ label }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="form-group" style="margin-bottom: 0;">
+                    <label for="searchStatus">Status</label>
+                    <select id="searchStatus" name="status" class="form-control">
+                        {% for val, label in statuses %}
+                            <option value="{{ val }}" {% if selected_status == val %}selected{% endif %}>
+                                {{ label }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="form-group" style="margin-bottom: 0;">
+                    <label for="searchSort">Sort By</label>
+                    <select id="searchSort" name="sort" class="form-control">
+                        <option value="newest" {% if selected_sort == 'newest' %}selected{% endif %}>Newest First</option>
+                        <option value="oldest" {% if selected_sort == 'oldest' %}selected{% endif %}>Oldest First</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="search-actions" style="margin-top: 1.5rem;">
+                <button type="submit" class="btn btn-primary" style="min-width: 160px;">
+                    Apply Filters
+                </button>
+                <a href="{{ url_for('items.search') }}" class="btn btn-secondary">
+                    Clear Filters
+                </a>
+            </div>
+        </form>
+    </div>
+
+    <!-- Results Meta -->
+    <div class="results-meta">
+        <div>
+            Showing <strong>{{ results_count }}</strong> {% if results_count == 1 %}item{% else %}items{% endif %}
+            {% if query %} matching "<em>{{ query }}</em>"{% endif %}
+            {% if selected_category %} in <strong>{{ selected_category.title() }}</strong>{% endif %}
+        </div>
+        <div>
+            <a href="{{ url_for('items.report') }}" class="btn btn-primary btn-sm">
+                + Report a Found Item
+            </a>
+        </div>
+    </div>
+
+    <!-- Results Grid -->
+    {% if items %}
+        <div class="results-grid" id="searchResultsGrid">
+            {% for item in items %}
+                <div class="item-card" onclick="openItemModal({{ item.id }})" tabindex="0" role="button" aria-label="View details for {{ item.name }}">
+                    <div class="item-card-image-wrap">
+                        <img src="{{ item.primary_image_url }}" alt="{{ item.name }}" loading="lazy">
+                        <span class="item-status-overlay {{ item.status_badge_class }}">
+                            {{ item.status_label }}
+                        </span>
+                    </div>
+                    <div class="item-card-content">
+                        <h3>{{ item.name }}</h3>
+                        <div class="meta-line">
+                            <span>📍</span> {{ item.location_found }}
+                        </div>
+                        <div class="meta-line">
+                            <span>📅</span> Found {{ item.date_found.strftime('%b %d, %Y') }}
+                        </div>
+                        <p class="desc-preview">{{ item.public_description }}</p>
+                        <div class="badge-row">
+                            <span class="badge">{{ item.category }}</span>
+                            <span class="badge badge-finder">Found by {{ item.finder_display_name }}</span>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <!-- Helpful Empty Results State -->
+        <div style="background: white; border-radius: 20px; padding: 4rem 2rem; text-align: center; box-shadow: var(--shadow-soft); margin-top: 2rem;">
+            <div style="font-size: 3rem; margin-bottom: 1rem;">🔍</div>
+            <h3 style="color: #667eea; font-size: 1.5rem; margin-bottom: 0.5rem;">No matching items found</h3>
+            <p style="color: #64748b; max-width: 500px; margin: 0 auto 1.5rem;">
+                We couldn't find any belongings matching your current filters. Try loosening your search terms or checking back soon.
+            </p>
+            <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
+                <a href="{{ url_for('items.search') }}" class="btn btn-secondary">Reset Filters</a>
+                <a href="{{ url_for('items.report') }}" class="btn btn-primary">Report a Found Item</a>
+            </div>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

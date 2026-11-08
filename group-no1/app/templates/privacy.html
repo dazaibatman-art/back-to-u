@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+
+{% block title %}Privacy Policy — Group No1{% endblock %}
+
+{% block content %}
+<div style="max-width: 850px; margin: 2rem auto;">
+    <div style="background: white; border-radius: 20px; padding: 3rem 2.5rem; box-shadow: var(--shadow-elevated);">
+        <h1 style="color: #667eea; font-size: 2.2rem; margin-bottom: 1.5rem;">Privacy Policy</h1>
+
+        <section style="margin-bottom: 1.8rem;">
+            <h3 style="color: #1e293b; margin-bottom: 0.6rem;">1. Protection of Private Verification Details</h3>
+            <p style="color: #475569; font-size: 0.95rem; line-height: 1.7;">
+                When you report a found item, the private verification details (such as serial numbers, secret scratches, or internal wallet contents) are stored securely in our database and are <strong>never</strong> displayed in public searches, public item cards, or search engine indices. They are accessible exclusively to the reporting finder and authorized reviewers.
+            </p>
+        </section>
+
+        <section style="margin-bottom: 1.8rem;">
+            <h3 style="color: #1e293b; margin-bottom: 0.6rem;">2. Contact Information Confidentiality</h3>
+            <p style="color: #475569; font-size: 0.95rem; line-height: 1.7;">
+                Your email address and phone number are never made public by default. Group No1 provides built-in safe in-app messaging so you can coordinate verification and returns without disclosing personal phone numbers or home addresses.
+            </p>
+        </section>
+
+        <section style="margin-bottom: 1.8rem;">
+            <h3 style="color: #1e293b; margin-bottom: 0.6rem;">3. Password Security &amp; Data Integrity</h3>
+            <p style="color: #475569; font-size: 0.95rem; line-height: 1.7;">
+                All user passwords are encrypted using state-of-the-art cryptographic hashing (scrypt) with salted keys before persistence. Plaintext passwords are never recorded in database tables, system caches, or server application logs.
+            </p>
+        </section>
+    </div>
+</div>
+{% endblock %}

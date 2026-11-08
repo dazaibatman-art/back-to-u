@@ -1,0 +1,139 @@
+{% extends "base.html" %}
+
+{% block title %}My Dashboard — Group No1{% endblock %}
+
+{% block content %}
+<div style="margin: 2rem 0;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; color: white; flex-wrap: wrap; gap: 1rem;">
+        <div>
+            <h1 style="font-size: 2.2rem; font-weight: 700; margin: 0;">Welcome, {{ current_user.full_name }}</h1>
+            <p style="opacity: 0.9; margin: 0.3rem 0 0;">Manage your reported items, track ownership claims, and check activity.</p>
+        </div>
+        <div>
+            <a href="{{ url_for('items.report') }}" class="btn btn-primary" style="background: white; color: #667eea !important; border: none;">
+                + Report New Found Item
+            </a>
+        </div>
+    </div>
+
+    <!-- The Three Dashboard Stat Cards (Preserved & Database-Backed) -->
+    <div class="dashboard-grid">
+        <div class="stat-card">
+            <h3>My Found Items</h3>
+            <div class="stat-number">{{ found_items_count }}</div>
+            <a href="{{ url_for('dashboard.my_items') }}" class="btn btn-primary btn-block">
+                View Items
+            </a>
+        </div>
+
+        <div class="stat-card">
+            <h3>My Claims</h3>
+            <div class="stat-number">{{ claims_count }}</div>
+            <a href="{{ url_for('dashboard.my_claims') }}" class="btn btn-primary btn-block">
+                View Claims
+            </a>
+        </div>
+
+        <div class="stat-card">
+            <h3>Trust Score</h3>
+            <div class="stat-number" style="font-size: 2.2rem;">{{ trust_score_display }}</div>
+            <a href="{{ url_for('auth.profile') }}" class="btn btn-secondary btn-block">
+                View Profile
+            </a>
+        </div>
+    </div>
+
+    <!-- Incoming Claims for Items Found by User -->
+    {% if incoming_claims %}
+        <div class="panel-card" style="margin-bottom: 2rem; border-left: 5px solid #f59e0b;">
+            <h3 style="color: #92400e;">
+                <span>⚠️ Action Required: Claims on Your Found Items ({{ incoming_claims|length }})</span>
+            </h3>
+            <div class="activity-list">
+                {% for claim in incoming_claims %}
+                    <div class="activity-item">
+                        <div>
+                            <strong>{{ claim.claimant.full_name }}</strong> claimed your reported item 
+                            <a href="{{ url_for('items.detail', item_id=claim.item.id) }}" style="color: #667eea; font-weight: 600;">
+                                {{ claim.item.name }}
+                            </a>
+                            <div style="font-size: 0.8rem; color: #64748b;">
+                                Submitted {{ claim.created_at.strftime('%b %d, %Y') }}
+                            </div>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 0.8rem;">
+                            <span class="badge {{ claim.status_badge_class }}">{{ claim.status }}</span>
+                            <a href="{{ url_for('claims.detail', claim_id=claim.id) }}" class="btn btn-primary btn-sm">
+                                Review Evidence &rarr;
+                            </a>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    {% endif %}
+
+    <!-- Recent Activity Grids -->
+    <div class="dashboard-sections">
+        <!-- Recent Items Reported -->
+        <div class="panel-card">
+            <h3>
+                <span>My Recent Found Reports</span>
+                <a href="{{ url_for('dashboard.my_items') }}" style="font-size: 0.85rem; font-weight: normal; color: #667eea;">View All &rarr;</a>
+            </h3>
+
+            {% if recent_items %}
+                <ul class="activity-list">
+                    {% for item in recent_items %}
+                        <li class="activity-item">
+                            <div>
+                                <a href="{{ url_for('items.detail', item_id=item.id) }}" style="font-weight: 600; color: #1e293b; text-decoration: none;">
+                                    {{ item.name }}
+                                </a>
+                                <div style="font-size: 0.8rem; color: #64748b;">
+                                    📍 {{ item.location_found }} • {{ item.date_found.strftime('%b %d, %Y') }}
+                                </div>
+                            </div>
+                            <span class="badge {{ item.status_badge_class }}">{{ item.status_label }}</span>
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p style="color: #94a3b8; font-size: 0.95rem; text-align: center; padding: 1.5rem 0;">
+                    You haven't reported any found items yet.
+                </p>
+            {% endif %}
+        </div>
+
+        <!-- Recent Claims Submitted -->
+        <div class="panel-card">
+            <h3>
+                <span>My Claims Activity</span>
+                <a href="{{ url_for('dashboard.my_claims') }}" style="font-size: 0.85rem; font-weight: normal; color: #667eea;">View All &rarr;</a>
+            </h3>
+
+            {% if recent_claims %}
+                <ul class="activity-list">
+                    {% for claim in recent_claims %}
+                        <li class="activity-item">
+                            <div>
+                                <a href="{{ url_for('claims.detail', claim_id=claim.id) }}" style="font-weight: 600; color: #1e293b; text-decoration: none;">
+                                    Claim on {{ claim.item.name }}
+                                </a>
+                                <div style="font-size: 0.8rem; color: #64748b;">
+                                    Submitted {{ claim.created_at.strftime('%b %d, %Y') }}
+                                </div>
+                            </div>
+                            <span class="badge {{ claim.status_badge_class }}">{{ claim.status }}</span>
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p style="color: #94a3b8; font-size: 0.95rem; text-align: center; padding: 1.5rem 0;">
+                    You haven't submitted any ownership claims yet.
+                </p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

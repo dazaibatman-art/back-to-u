@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+
+{% block title %}Login — Group No1{% endblock %}
+
+{% block content %}
+<div class="auth-container">
+    <h2>Welcome Back</h2>
+    <p class="subtitle">Log in to manage your found items, check ownership claims, and communicate safely.</p>
+
+    <form method="POST" action="{{ url_for('auth.login', next=request.args.get('next')) }}">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+        <div class="form-group">
+            {{ form.email.label }}
+            {{ form.email(class="form-control", placeholder="Enter your email address", id="loginEmail") }}
+            {% for error in form.email.errors %}
+                <span class="field-error">{{ error }}</span>
+            {% endfor %}
+        </div>
+
+        <div class="form-group">
+            {{ form.password.label }}
+            {{ form.password(class="form-control", placeholder="Enter your password", id="loginPassword") }}
+            {% for error in form.password.errors %}
+                <span class="field-error">{{ error }}</span>
+            {% endfor %}
+        </div>
+
+        <div class="checkbox-group">
+            {{ form.remember_me() }}
+            {{ form.remember_me.label }}
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-block" style="padding: 0.85rem; font-size: 1rem;">
+            Login
+        </button>
+
+        <p style="text-align: center; margin-top: 1.5rem; color: #64748b; font-size: 0.95rem;">
+            Don't have an account? 
+            <a href="{{ url_for('auth.register') }}" style="color: #667eea; font-weight: 600; text-decoration: none;">Sign up</a>
+        </p>
+    </form>
+</div>
+{% endblock %}

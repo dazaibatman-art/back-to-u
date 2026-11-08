@@ -1,0 +1,142 @@
+{% extends "base.html" %}
+
+{% block title %}Group No1 — Global Lost & Found{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero">
+    <h1>Lost Something? Found Something?</h1>
+    <p>Connect with people worldwide to reunite lost items with their owners through secure verification and private coordination.</p>
+    
+    <div class="hero-actions">
+        <a href="{{ url_for('items.report') }}" class="btn btn-primary">
+            📢 Report Found Item
+        </a>
+        <a href="{{ url_for('items.search') }}" class="btn btn-secondary">
+            🔍 Search Lost Items
+        </a>
+    </div>
+</section>
+
+<!-- Quick Search Form -->
+<section class="search-box">
+    <h2>Search For Lost Belongings</h2>
+    <form action="{{ url_for('items.search') }}" method="GET">
+        <div class="search-grid">
+            <input type="text" name="q" placeholder="What did you lose? (e.g. wallet, phone, keys)" class="form-control">
+            <input type="text" name="location" placeholder="Location (city, park, transit)" class="form-control">
+            <select name="category" class="form-control">
+                <option value="">All Categories</option>
+                <option value="electronics">Electronics</option>
+                <option value="documents">Documents</option>
+                <option value="accessories">Accessories</option>
+                <option value="bags">Bags</option>
+                <option value="jewelry">Jewelry</option>
+                <option value="other">Other</option>
+            </select>
+        </div>
+        <div class="search-actions">
+            <button type="submit" class="btn btn-primary" style="min-width: 200px;">
+                Find Belongings
+            </button>
+        </div>
+    </form>
+</section>
+
+<!-- The Four Original Feature Cards -->
+<section class="features">
+    <div class="feature-card">
+        <div class="icon">🔍</div>
+        <h3>Smart Search</h3>
+        <p>Find your lost items quickly with our intelligent search filters and category indexing.</p>
+    </div>
+    <div class="feature-card">
+        <div class="icon">🔒</div>
+        <h3>Secure Verification</h3>
+        <p>Protected ownership verification keeps private identifying marks confidential to prevent fraud.</p>
+    </div>
+    <div class="feature-card">
+        <div class="icon">💬</div>
+        <h3>Safe Communication</h3>
+        <p>In-app messaging allows finders and claimants to coordinate handoff without publicly exposing contact details.</p>
+    </div>
+    <div class="feature-card">
+        <div class="icon">🌍</div>
+        <h3>Global Platform</h3>
+        <p>Connect with finders and owners across different neighborhoods, cities, and countries.</p>
+    </div>
+</section>
+
+<!-- Recently Found Items Showcase (Real Database Records) -->
+<section style="margin-top: 3rem;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; color: white;">
+        <h2 style="font-size: 1.8rem; font-weight: 700;">Recent Found Items</h2>
+        <a href="{{ url_for('items.search') }}" class="btn btn-secondary btn-sm">View All Items &rarr;</a>
+    </div>
+
+    {% if recent_items %}
+        <div class="results-grid">
+            {% for item in recent_items %}
+                <div class="item-card" onclick="openItemModal({{ item.id }})" tabindex="0" role="button" aria-label="View details for {{ item.name }}">
+                    <div class="item-card-image-wrap">
+                        <img src="{{ item.primary_image_url }}" alt="{{ item.name }}" loading="lazy">
+                        <span class="item-status-overlay {{ item.status_badge_class }}">
+                            {{ item.status_label }}
+                        </span>
+                    </div>
+                    <div class="item-card-content">
+                        <h3>{{ item.name }}</h3>
+                        <div class="meta-line">
+                            <span>📍</span> {{ item.location_found }}
+                        </div>
+                        <div class="meta-line">
+                            <span>📅</span> Found {{ item.date_found.strftime('%b %d, %Y') }}
+                        </div>
+                        <p class="desc-preview">{{ item.public_description }}</p>
+                        <div class="badge-row">
+                            <span class="badge">{{ item.category }}</span>
+                            <span class="badge badge-finder">Found by {{ item.finder_display_name }}</span>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div style="background: white; border-radius: 20px; padding: 3rem; text-align: center; box-shadow: var(--shadow-soft);">
+            <div style="font-size: 2.5rem; margin-bottom: 0.5rem;">📦</div>
+            <h3 style="color: #667eea; margin-bottom: 0.5rem;">No items reported yet</h3>
+            <p style="color: #64748b; margin-bottom: 1.5rem;">Be the first person to report a found belonging and help reunite it with its owner!</p>
+            <a href="{{ url_for('items.report') }}" class="btn btn-primary">Report a Found Item</a>
+        </div>
+    {% endif %}
+</section>
+
+<!-- Configurable Team / About Section (Replaces the Founder profile card) -->
+<section class="team-section">
+    <h2>Meet the Group No1 Team</h2>
+    <p class="lead">Dedicated to building transparent, secure community tools that bring lost belongings back home.</p>
+
+    <div class="team-grid">
+        <div class="team-card">
+            <div class="team-avatar">💻</div>
+            <h4>Development Team</h4>
+            <div class="role">Platform Architecture</div>
+            <p class="desc">Engineering robust search algorithms, data encryption, and responsive interfaces.</p>
+        </div>
+
+        <div class="team-card">
+            <div class="team-avatar">🛡️</div>
+            <h4>Verification Team</h4>
+            <div class="role">Ownership Security</div>
+            <p class="desc">Managing private verification workflows and preventing fraudulent claims.</p>
+        </div>
+
+        <div class="team-card">
+            <div class="team-avatar">🤝</div>
+            <h4>Community Operations</h4>
+            <div class="role">Safe Returns Coordination</div>
+            <p class="desc">Facilitating safe, confidential communication between finders and owners.</p>
+        </div>
+    </div>
+</section>
+{% endblock %}

@@ -1,0 +1,131 @@
+{% extends "base.html" %}
+
+{% block title %}Claim #{{ claim.id }} — Group No1{% endblock %}
+
+{% block content %}
+<div style="max-width: 900px; margin: 2rem auto;">
+    <div style="margin-bottom: 1.5rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+        <a href="{{ url_for('items.detail', item_id=item.id) }}" class="btn btn-secondary btn-sm" style="color: white; border-color: white;">
+            &larr; Back to Item: {{ item.name }}
+        </a>
+        <span class="badge {{ claim.status_badge_class }}" style="font-size: 1rem; padding: 0.5rem 1.2rem;">
+            Claim Status: {{ claim.status }}
+        </span>
+    </div>
+
+    <!-- Main Claim Details Card -->
+    <div style="background: white; border-radius: 20px; padding: 2.5rem; box-shadow: var(--shadow-elevated); margin-bottom: 2rem;">
+        <h2 style="color: #667eea; margin-bottom: 1rem; font-size: 1.8rem;">Ownership Claim Details</h2>
+        
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem; margin-bottom: 1.8rem; background: #f8fafc; padding: 1.2rem; border-radius: 12px;">
+            <div>
+                <strong style="color: #64748b; font-size: 0.85rem; text-transform: uppercase;">Item</strong>
+                <p style="font-weight: 600; color: #1e293b; margin: 0.2rem 0 0;">{{ item.name }}</p>
+            </div>
+            <div>
+                <strong style="color: #64748b; font-size: 0.85rem; text-transform: uppercase;">Claimant</strong>
+                <p style="font-weight: 600; color: #1e293b; margin: 0.2rem 0 0;">{{ claim.claimant.full_name }}</p>
+            </div>
+            <div>
+                <strong style="color: #64748b; font-size: 0.85rem; text-transform: uppercase;">Date Submitted</strong>
+                <p style="font-weight: 600; color: #1e293b; margin: 0.2rem 0 0;">{{ claim.created_at.strftime('%b %d, %Y at %H:%M') }}</p>
+            </div>
+        </div>
+
+        <div style="margin-bottom: 1.5rem;">
+            <h4 style="color: #334155; margin-bottom: 0.5rem;">Claim Explanation</h4>
+            <div style="padding: 1.2rem; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 10px; font-size: 0.95rem; line-height: 1.6;">
+                {{ claim.claim_message }}
+            </div>
+        </div>
+
+        <div style="margin-bottom: 1.5rem;">
+            <h4 style="color: #334155; margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.4rem;">
+                <span>🔒</span> Confidential Ownership Evidence (Protected)
+            </h4>
+            <div style="padding: 1.2rem; background: #fefce8; border: 1px solid #fef08a; border-radius: 10px; font-size: 0.95rem; color: #713f12; line-height: 1.6;">
+                {{ claim.evidence_details }}
+            </div>
+        </div>
+
+        {% if claim.review_notes %}
+            <div style="margin-bottom: 1.5rem;">
+                <h4 style="color: #334155; margin-bottom: 0.5rem;">Reviewer Notes</h4>
+                <div style="padding: 1rem; background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 10px; font-size: 0.95rem; color: #166534;">
+                    {{ claim.review_notes }}
+                </div>
+            </div>
+        {% endif %}
+
+        <!-- Review Controls (Finder / Admin Only) -->
+        {% if is_finder or is_admin %}
+            <div style="margin-top: 2rem; padding-top: 1.8rem; border-top: 2px dashed #e2e8f0;">
+                <h3 style="color: #1e293b; margin-bottom: 1rem; font-size: 1.2rem;">Finder / Admin Review Controls</h3>
+                
+                <form action="{{ url_for('claims.review_claim', claim_id=claim.id) }}" method="POST">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    
+                    <div class="form-group">
+                        {{ review_form.action.label }}
+                        {{ review_form.action(class="form-control") }}
+                    </div>
+
+                    <div class="form-group">
+                        {{ review_form.review_notes.label }}
+                        {{ review_form.review_notes(class="form-control", rows="3", placeholder="Feedback, verification questions, or meeting instructions...") }}
+                    </div>
+
+                    <button type="submit" class="btn btn-primary">Update Review Decision</button>
+                </form>
+
+                {% if claim.status == 'Approved' and item.status != 'returned' %}
+                    <div style="margin-top: 1.5rem; padding: 1.2rem; background: #ecfdf5; border-radius: 10px; border: 1px solid #a7f3d0; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+                        <div>
+                            <strong style="color: #065f46;">Item Handoff Completed?</strong>
+                            <p style="color: #047857; font-size: 0.9rem; margin: 0.2rem 0 0;">Once the belonging has been safely returned to the owner, mark this process completed.</p>
+                        </div>
+                        <form action="{{ url_for('claims.complete_return', claim_id=claim.id) }}" method="POST">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                            <button type="submit" class="btn btn-success">✅ Mark Return Completed</button>
+                        </form>
+                    </div>
+                {% endif %}
+            </div>
+        {% endif %}
+    </div>
+
+    <!-- Safe In-App Communication Section (Protects Personal Contact Info) -->
+    <div style="background: white; border-radius: 20px; padding: 2.5rem; box-shadow: var(--shadow-elevated);">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.2rem;">
+            <h3 style="color: #667eea; margin: 0; font-size: 1.4rem;">💬 Safe In-App Messages</h3>
+            <span style="font-size: 0.85rem; color: #64748b;">Coordinate handoff privately</span>
+        </div>
+
+        <div class="chat-thread" id="chatThread">
+            {% if claim.messages %}
+                {% for msg in claim.messages %}
+                    <div class="chat-bubble {% if msg.sender_id == current_user.id %}sent{% else %}received{% endif %}">
+                        <div>{{ msg.content }}</div>
+                        <span class="chat-time">
+                            {% if msg.sender_id == current_user.id %}You{% else %}{{ msg.sender.full_name }}{% endif %} • 
+                            {{ msg.created_at.strftime('%b %d, %H:%M') }}
+                        </span>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <div style="text-align: center; color: #94a3b8; padding: 2rem;">
+                    No messages yet. Send a message to coordinate verification or safe handoff details.
+                </div>
+            {% endif %}
+        </div>
+
+        <form action="{{ url_for('claims.send_message', claim_id=claim.id) }}" method="POST">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <div class="form-group" style="margin-bottom: 0.8rem;">
+                {{ message_form.content(class="form-control", rows="2", placeholder="Type a message (e.g. 'Can we meet at the security desk of City Hall?')...") }}
+            </div>
+            <button type="submit" class="btn btn-primary" style="min-width: 150px;">Send Message</button>
+        </form>
+    </div>
+</div>
+{% endblock %}
