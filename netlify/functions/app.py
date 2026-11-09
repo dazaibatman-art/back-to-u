@@ -1,31 +1,46 @@
 """
 Netlify Serverless Function Handler for Group No1 Flask Application.
-Routes incoming HTTP requests to Flask via serverless-wsgi.
+
+Netlify builds from the repo root, so paths must be resolved relative
+to this file's real location inside the built Lambda package.
 """
 
+import os
 import sys
 from pathlib import Path
 
-# Add project root and group-no1 to Python path
-BASE_DIR = Path(__file__).resolve().parent.parent.parent
-sys.path.insert(0, str(BASE_DIR))
-sys.path.insert(0, str(BASE_DIR / "group-no1"))
+# ─── Path setup ──────────────────────────────────────────────────────────────
+# This file lives at: <repo-root>/netlify/functions/app.py
+# After Netlify's build, included_files puts group-no1 at the same
+# repo-root level inside the Lambda package.
+_HERE = Path(__file__).resolve().parent          # .../netlify/functions/
+_REPO = _HERE.parent.parent                      # repo root
+_APP  = _REPO / "group-no1"                      # Flask app package root
 
-import serverless_wsgi
-from app import create_app
-from app.extensions import db
+for _p in [str(_REPO), str(_APP)]:
+    if _p not in sys.path:
+        sys.path.insert(0, _p)
 
-# Create production app instance
-app = create_app("production")
+# ─── Ensure /tmp dirs exist (Lambda has read-only FS except /tmp) ─────────────
+os.makedirs("/tmp/uploads", exist_ok=True)
 
-# Ensure tables exist on cold start
-with app.app_context():
+# ─── App factory ─────────────────────────────────────────────────────────────
+import serverless_wsgi  # noqa: E402
+from app import create_app  # noqa: E402
+from app.extensions import db  # noqa: E402
+
+flask_app = create_app("production")
+
+# Initialise database tables on cold start (SQLite in /tmp)
+with flask_app.app_context():
     try:
         db.create_all()
     except Exception as exc:
-        print(f"Warning: Database initialization exception on Netlify cold start: {exc}")
+        # Non-fatal — log and continue; the function will still start
+        print(f"[group-no1] DB init warning on cold start: {exc}", flush=True)
 
 
+# ─── Handler ─────────────────────────────────────────────────────────────────
 def handler(event, context):
-    """Serverless Lambda handler for Netlify."""
-    return serverless_wsgi.handle_request(app, event, context)
+    """AWS Lambda / Netlify Functions entry point."""
+    return serverless_wsgi.handle_request(flask_app, event, context)

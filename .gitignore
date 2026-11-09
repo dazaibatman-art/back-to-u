@@ -34,3 +34,9 @@ tests/test_uploads/*
 Thumbs.db
 .vscode/
 .idea/
+
+# Netlify local state (must not be committed)
+.netlify/state.json
+
+# Local deploy script
+deploy_to_netlify.py
