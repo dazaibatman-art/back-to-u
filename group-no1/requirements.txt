@@ -7,3 +7,5 @@ email-validator>=2.1.0
 python-dotenv>=1.0.0
 Werkzeug>=3.0.0
 pytest>=8.0.0
+serverless-wsgi>=3.1.0
+psycopg2-binary>=2.9.9

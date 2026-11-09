@@ -1,0 +1,18 @@
+[build]
+  command = "pip install -r requirements.txt"
+  functions = "netlify/functions"
+  publish = "group-no1/app"
+
+[build.environment]
+  PYTHON_VERSION = "3.11"
+
+[functions]
+  included_files = ["group-no1/**"]
+
+# Static assets will be served directly if they exist in publish dir.
+# Dynamic requests route to the Flask serverless function.
+[[redirects]]
+  from = "/*"
+  to = "/.netlify/functions/app"
+  status = 200
+  force = false

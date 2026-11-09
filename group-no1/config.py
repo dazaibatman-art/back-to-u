@@ -8,15 +8,26 @@ BASE_DIR = Path(__file__).resolve().parent
 # Load environment variables from .env file if present
 load_dotenv(BASE_DIR / ".env")
 
+IS_SERVERLESS = bool(os.environ.get("NETLIFY") or os.environ.get("AWS_LAMBDA_FUNCTION_NAME"))
+
 
 def get_database_uri() -> str:
-    """Resolve database URI reliably using absolute paths for local SQLite."""
+    """Resolve database URI reliably across local, serverless (Netlify), and production PostgreSQL."""
     raw_url = os.environ.get("DATABASE_URL")
+    
     if not raw_url:
-        db_path = (BASE_DIR / "instance" / "lost_and_found.db").resolve()
-        db_path.parent.mkdir(parents=True, exist_ok=True)
+        if IS_SERVERLESS:
+            # Netlify Lambda filesystems are read-only except /tmp
+            db_path = Path("/tmp/lost_and_found.db")
+        else:
+            db_path = (BASE_DIR / "instance" / "lost_and_found.db").resolve()
+            db_path.parent.mkdir(parents=True, exist_ok=True)
         return f"sqlite:///{db_path.as_posix()}"
     
+    # SQLAlchemy 1.4+ / 2.0 compatibility for PostgreSQL URIs
+    if raw_url.startswith("postgres://"):
+        raw_url = raw_url.replace("postgres://", "postgresql://", 1)
+
     # If it's a relative SQLite URI, resolve it against BASE_DIR
     if raw_url.startswith("sqlite:///") and not raw_url.startswith("sqlite:////"):
         rel_path = raw_url.replace("sqlite:///", "")
@@ -29,11 +40,14 @@ def get_database_uri() -> str:
 
 
 def get_upload_folder() -> str:
-    """Resolve upload folder reliably as absolute path."""
-    raw_folder = os.environ.get("UPLOAD_FOLDER", "uploads")
-    p = Path(raw_folder)
-    if not p.is_absolute():
-        p = (BASE_DIR / p).resolve()
+    """Resolve upload folder reliably across local and serverless environments."""
+    if IS_SERVERLESS:
+        p = Path("/tmp/uploads")
+    else:
+        raw_folder = os.environ.get("UPLOAD_FOLDER", "uploads")
+        p = Path(raw_folder)
+        if not p.is_absolute():
+            p = (BASE_DIR / p).resolve()
     p.mkdir(parents=True, exist_ok=True)
     return str(p)
 
@@ -99,7 +113,7 @@ class ProductionConfig(Config):
     """Production configuration."""
     DEBUG = False
     TESTING = False
-    SESSION_COOKIE_SECURE = True
+    SESSION_COOKIE_SECURE = os.environ.get("SESSION_COOKIE_SECURE", "False").lower() in ("true", "1", "yes")
 
 
 config_by_name = {
