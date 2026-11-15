@@ -38,5 +38,6 @@ Thumbs.db
 # Netlify local state (must not be committed)
 .netlify/state.json
 
-# Local deploy script
+# Local deploy script and tools
 deploy_to_netlify.py
+.node/
